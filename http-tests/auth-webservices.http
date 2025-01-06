@@ -1,0 +1,329 @@
+
+### Authenticate
+GET {{host}}/actuator
+
+### authenticate
+POST {{host}}/v1/accounts/authenticate
+Content-Type: application/json
+
+{
+  "idToken": "+201260032632",
+  "deviceId": "91235778sd412qwwtest",
+  "deviceType": "android"
+}
+
+> {%
+    client.assert(response.status === 200)
+    client.global.set("accessToken", response.body.accessToken)
+    client.global.set("refreshToken", response.body.refreshToken)
+
+%}
+
+### Register FCM Token
+
+POST {{host}}/v1/accounts/register-fcm-token
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "fcmToken": "ec-RVDOIQE8Cjx1sbZ4H_L:APA91bGM464Nv_BnV1r48C0bPhHLnRHNEGlg0NekUn1JW_slXy7t20eSMtPQNF8ZlwzOzNDWDiH0YmdTa3P0EGc3aWxbhUGxM584EAikK6xzRAlJqQTNSLPdJg7HmL2OVjkA5no71F6N"
+}
+> {%
+    client.assert(response.status === 201)
+%}
+
+### Invite user
+
+POST {{host}}/v1/accounts/invite
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "mobileNumber": "201260032633"
+}
+> {%
+    client.assert(response.status === 200)
+%}
+
+###
+
+### Get connections
+
+GET {{host}}/v1/accounts/connections
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+> {%
+    client.assert(response.status === 200)
+%}
+### Get connections
+
+GET {{host}}/v1/accounts/85f494a5-b208-4274-b0ad-b4ec282ed555/connections
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+> {%
+    client.assert(response.status === 200)
+%}
+
+###
+###
+
+POST {{host}}/v1/accounts/refresh-token
+Content-Type: application/json
+Authorization: Bearer {{refreshToken}}
+
+{
+  "lang": "en"
+}
+> {%
+    client.assert(response.status === 200)
+    client.global.set("accessToken", response.body.accessToken)
+%}
+
+###
+POST {{host}}/v1/accounts/update-basic-info
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "fullName": "Hassan Ibrahim",
+  "photoUrl": "http://photo.com"
+}
+> {%
+    client.assert(response.status === 200)
+    client.global.set("accessToken", response.body.accessToken)
+%}
+
+
+###
+
+POST {{host}}/v1/accounts/f793947f-8ebf-450a-a73a-bfc47f7cd016/block
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+> {%
+    client.assert(response.status === 200)
+%}
+
+###
+
+
+POST {{host}}/v1/accounts/f793947f-8ebf-450a-a73a-bfc47f7cd016/un-block
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+
+> {%
+    client.assert(response.status === 200)
+%}
+
+### Add permission
+
+POST {{host}}/v1/accounts/f793947f-8ebf-450a-a73a-bfc47f7cd016/permissions
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "permission": "CREATE_CASES"
+}
+
+> {%
+    client.assert(response.status === 200)
+%}
+
+###
+
+### Remove permission
+
+DELETE {{host}}/v1/accounts/f793947f-8ebf-450a-a73a-bfc47f7cd016/permissions
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "permission": "CREATE_CASES"
+}
+> {%
+    client.assert(response.status === 200)
+%}
+
+### Create case
+POST {{host}}/v1/cases
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "title": "نداء عاجل",
+  "description": "👈فتاة 33سنة  \n يتيمة فقيرة في مقتبل عمرها، كانت مسيحية، منًَ الله عليها بالإسلام، فأقبلت بقلبها عليه فأسلمت حديثا، ومعها أختيها، وهي الوحيدة التي نجت من الإمساك بها ، و قُبض على أختيها، واللتان تركتا لها ستة من الأطفال الصغار فرت بهم، تكفلت أسرة مسلمة بأربعة منهم، وأخذت هي اثنان لأختها الوسطى ( زياد عمره خمس سنوات، وزينة عمرها ثلاث سنوات )، لم تتزوج بعد، فوهبت نفسها؛ لتربيتهما، وهي لا دخل لها سوى ماكينة خياطة تعمل عليها، وهي لا تكفي حاجات الطفلين الصغيرين، وبفضل الله استطعنا أن نوفر لها سكنا يتطلب مالا ونفقة شهرية شقة إيجار جديد قدره 700ج ، غير الكهرباء\n \n 👈 المطلوب👇👇 \n تحتاج إلى مصروفات لها وللطفلين الصغيرين اليتيمين، خاصة أنها لا دخل لها، وهي وحيدة ليس لها إلا الله ثم أنتم في هذه الظروف التي تمر بها البلاد.\n تحتاج الفتاة الفقيرة اليتيمة لدعم إخوتها في صحبة الجنة حتى تستمر حياة الطفلين اليتيمين، وتكون في غنى عن سؤال الناس.\n \n\n المطلوب👇👇\n 15000 ج\n ولو زاد يكون أفضل\n وتجوز زكاة المال\n",
+  "goal": 15000,
+  "publish": true,
+  "acceptZakat": true,
+  "documents": []
+}
+
+> {%
+    client.assert(response.status === 201)
+    client.global.set("caseCode", response.body.caseCode)
+%}
+
+### Create DraftCase
+POST {{host}}/v1/cases
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "title": "نداء عاجل",
+  "description": "👈فتاة 33سنة  \n يتيمة فقيرة في مقتبل عمرها، كانت مسيحية، منًَ الله عليها بالإسلام، فأقبلت بقلبها عليه فأسلمت حديثا، ومعها أختيها، وهي الوحيدة التي نجت من الإمساك بها ، و قُبض على أختيها، واللتان تركتا لها ستة من الأطفال الصغار فرت بهم، تكفلت أسرة مسلمة بأربعة منهم، وأخذت هي اثنان لأختها الوسطى ( زياد عمره خمس سنوات، وزينة عمرها ثلاث سنوات )، لم تتزوج بعد، فوهبت نفسها؛ لتربيتهما، وهي لا دخل لها سوى ماكينة خياطة تعمل عليها، وهي لا تكفي حاجات الطفلين الصغيرين، وبفضل الله استطعنا أن نوفر لها سكنا يتطلب مالا ونفقة شهرية شقة إيجار جديد قدره 700ج ، غير الكهرباء\n \n 👈 المطلوب👇👇 \n تحتاج إلى مصروفات لها وللطفلين الصغيرين اليتيمين، خاصة أنها لا دخل لها، وهي وحيدة ليس لها إلا الله ثم أنتم في هذه الظروف التي تمر بها البلاد.\n تحتاج الفتاة الفقيرة اليتيمة لدعم إخوتها في صحبة الجنة حتى تستمر حياة الطفلين اليتيمين، وتكون في غنى عن سؤال الناس.\n \n\n المطلوب👇👇\n 15000 ج\n ولو زاد يكون أفضل\n وتجوز زكاة المال\n",
+  "goal": 15000,
+  "publish": false,
+  "acceptZakat": true,
+  "documents": []
+}
+
+> {%
+    client.assert(response.status === 200)
+    client.global.set("DraftCaseCode", response.body.caseCode)
+%}
+
+### Udpdate case
+PUT {{host}}/v1/cases/{{caseCode}}
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "title": "حالة عاجلة جدا",
+  "description": "👈أ.عادل مدرس جومباز, \n👈عمل عمليه ورم في المخ بعد العمليه أدت لشلل نصفي وفقد عين \n 👈لديه ٣بنات ٢متزوجين والثالثه ستتزوج بعد العيد\n 👈مرتبه في المدرسه ٢٠٠٠ جنيه بيدفع جمعيه ٥٠٠جنيه شهريا علشان يجيب أي حاجة للعروسة \n 👈 ويشتري علاج خارج التأمين الصحي علاج غالي وباقي المرتب يعيش به \n 👈يسكن في شقه في بيت والده محتاجين بعض الرفايع ٢مروحه سقف وانبوبه بوتاجاز وبعض المفارش و٢ بطانيه ومكواه وطرابيزة وبعض ملابس للعروسه \n 4500 ج",
+  "goal": 3500,
+  "acceptZakat": true,
+  "documents": []
+}
+> {%
+    client.assert(response.status === 200)
+%}
+
+### Search cases
+
+GET {{host}}/v1/cases?limit=20&offset=0
+#Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+> {%
+    client.assert(response.status === 200)
+%}
+
+### Search cases
+
+GET {{host}}/v1/cases?offset=0&limit=20
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "test": "test"
+}
+> {%
+    client.assert(response.status === 200)
+%}
+
+### Get draft cases
+
+GET {{host}}/v1/draft-cases
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+> {%
+    client.assert(response.status === 200)
+%}
+
+### Get case details
+
+GET {{host}}/v1/cases/{{caseCode}}
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+> {%
+    client.assert(response.status === 200)
+%}
+
+### Open case
+
+POST {{host}}/v1/cases/{{caseCode}}/open
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+> {%
+    client.assert(response.status === 200)
+%}
+
+### Close case
+
+POST {{host}}/v1/cases/{{caseCode}}/close
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+> {%
+    client.assert(response.status === 200)
+%}
+
+### Contribute
+
+POST {{host}}/v1/cases/{{caseCode}}/contributions
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "amount": 100
+}
+
+> {%
+    client.assert(response.status === 200)
+    client.global.set("contributionId", response.body.contributionId)
+%}
+### pay contribution
+
+POST {{host}}/v1/contributions/{{contributionId}}/pay
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+> {%
+    client.assert(response.status === 200)
+%}
+
+### confirm contribution
+
+POST {{host}}/v1/contributions/{{contributionId}}/confirm
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+> {%
+    client.assert(response.status === 200)
+%}
+
+### Delete case
+
+DELETE {{host}}/v1/cases/{{DraftCaseCode}}
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+> {%
+    client.assert(response.status === 200)
+%}
+
+### Ledger summary
+
+GET {{host}}/v1/ledger/summary
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+> {%
+    client.assert(response.status === 200)
+%}
+
+### Ledger summary
+
+GET {{host}}/v1/ledger/85f494a5-b208-4274-b0ad-b4ec282ed555
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+> {%
+    client.assert(response.status === 200)
+%}
